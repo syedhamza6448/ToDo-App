@@ -1,65 +1,50 @@
-# Python Todo App
+# Todo App Monorepo
 
-A Python-based Todo application built with `uv`.
+This project is a full-stack Todo application using FastAPI and Next.js.
 
-## Project Structure
+## Structure
 
-- `src/`: Source code.
-- `specs/`: Specifications for features.
-- `Constitution.md`: Development principles.
+- `/backend`: FastAPI (Python 3.13+)
+- `/frontend`: Next.js 16+ (TypeScript, Tailwind)
+- `/specs`: Organized project specifications
+- `.spec-kit`: Configuration for Spec-Driven Development
 
 ## Prerequisites
 
-- Python 3.13+
-- `uv` (Universal Python Package Manager)
+- Python 3.13+ and `uv`
+- Node.js 18+ and `npm`
 
 ## Setup
 
-1.  **Install `uv`** (if not installed):
-    ```bash
-    pip install uv
-    # or follow official instructions at https://github.com/astral-sh/uv
-    ```
-
-2.  **Initialize/Sync Dependencies**:
-    ```bash
-    uv sync
-    ```
-
-## Usage
-
-Run the application:
-
+### Backend
 ```bash
-uv run src/todo_app/main.py
+cd backend
+uv sync
 ```
 
-### Examples
-
-**Adding a Task:**
-```text
-Select an option: 1
---- Add Task ---
-Title: Buy Groceries
-Description: Milk, Eggs, Bread
-Task [1] created successfully.
+### Frontend
+```bash
+cd frontend
+npm install
 ```
 
-**Viewing Tasks:**
-```text
-Select an option: 2
---- Task List ---
-[1] [ ] Buy Groceries - Milk, Eggs, Bread
+## Running the Application
+
+### Backend
+```bash
+cd backend
+uv run fastapi dev src/todo_app/main.py
 ```
 
-**Completing a Task:**
-```text
-Select an option: 5
---- Toggle Completion ---
-Task ID: 1
-Task 1 status changed to COMPLETED.
+### Frontend
+```bash
+cd frontend
+npm run dev
 ```
 
-## Development
-
-This project follows **Spec-Driven Development**. Please refer to `Constitution.md` before contributing.
+## Spec-Driven Development
+Refer to `Constitution.md` and the `specs/` folder.
+- `specs/features/`: Feature descriptions
+- `specs/api/`: API endpoints and models
+- `specs/database/`: Schema and persistence
+- `specs/ui/`: UI components and design

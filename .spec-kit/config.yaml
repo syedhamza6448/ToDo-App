@@ -1,0 +1,8 @@
+project_name: Todo-App-Monorepo
+spec_dirs:
+  features: specs/features
+  api: specs/api
+  database: specs/database
+  ui: specs/ui
+sdd_enabled: true
+constitution: Constitution.md
