@@ -14,6 +14,20 @@ This project is a full-stack Todo application using FastAPI and Next.js.
 - Python 3.13+ and `uv`
 - Node.js 18+ and `npm`
 
+## Environment Variables
+
+### Shared Secrets
+Both `/frontend` and `/backend` must share the same `BETTER_AUTH_SECRET` for JWT verification.
+
+### Backend (.env)
+- `DATABASE_URL`: Neon PostgreSQL connection string.
+- `BETTER_AUTH_SECRET`: Shared secret for JWT.
+
+### Frontend (.env.local)
+- `DATABASE_URL`: Database connection for Better Auth.
+- `BETTER_AUTH_SECRET`: Shared secret for JWT.
+- `NEXT_PUBLIC_APP_URL`: e.g., `http://localhost:3000`
+
 ## Setup
 
 ### Backend

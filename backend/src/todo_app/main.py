@@ -5,15 +5,9 @@ from datetime import datetime
 
 from todo_app.database import engine, get_session, init_db
 from todo_app.models import Task, TaskCreate, TaskUpdate, TaskRead, TaskStatus, User
+from todo_app.auth import get_current_user_id
 
 app = FastAPI(title="Todo App API", version="1.0.0")
-
-# Placeholder for dependency-based authentication
-# In a real app with Better Auth, this would verify the session/token
-async def get_current_user_id():
-    # Mocking a user ID for demonstration. 
-    # Integration with Better Auth would happen here.
-    return "user_12345"
 
 @app.on_event("startup")
 def on_startup():
