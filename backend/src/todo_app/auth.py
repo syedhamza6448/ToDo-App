@@ -5,7 +5,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from datetime import datetime
 
 security = HTTPBearer()
-SECRET_KEY = os.getenv("BETTER_AUTH_SECRET", "a-very-secret-shared-key-12345")
+SECRET_KEY = os.getenv("BETTER_AUTH_SECRET", "HgIOp5ggpCchLw144gHptypq16wv1WKi")
 ALGORITHM = "HS256"
 
 async def get_current_user_id(credentials: HTTPAuthorizationCredentials = Security(security)):
