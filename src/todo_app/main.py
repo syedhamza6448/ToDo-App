@@ -4,6 +4,7 @@ from todo_app.manager import TodoManager
 from todo_app.models import TaskStatus
 
 def print_menu():
+    """Displays the main menu to the console."""
     print("\n=== Todo App ===")
     print("1. Add Task")
     print("2. View Tasks")
@@ -13,12 +14,19 @@ def print_menu():
     print("6. Exit")
 
 def get_int_input(prompt: str) -> Optional[int]:
+    """
+    Safely prompts for an integer input.
+    
+    Returns:
+        Integer if valid, None otherwise.
+    """
     try:
         return int(input(prompt))
     except ValueError:
         return None
 
 def add_task_ui(manager: TodoManager):
+    """Workflow for adding a new task via user input."""
     print("\n--- Add Task ---")
     title = input("Title: ").strip()
     if not title:
@@ -30,6 +38,7 @@ def add_task_ui(manager: TodoManager):
     print(f"Task [{task.id}] created successfully.")
 
 def view_tasks_ui(manager: TodoManager):
+    """Workflow for displaying all tasks."""
     print("\n--- Task List ---")
     tasks = manager.get_all_tasks()
     if not tasks:
@@ -41,6 +50,7 @@ def view_tasks_ui(manager: TodoManager):
         print(f"[{task.id}] [{status_symbol}] {task.title} - {task.description}")
 
 def update_task_ui(manager: TodoManager):
+    """Workflow for updating an existing task's details."""
     print("\n--- Update Task ---")
     task_id = get_int_input("Task ID: ")
     if task_id is None:
@@ -55,10 +65,7 @@ def update_task_ui(manager: TodoManager):
     new_title = input(f"New Title (current: {task.title}): ").strip()
     new_desc = input(f"New Description (current: {task.description}): ").strip()
 
-    # Pass None if string is empty to indicate no change, 
-    # unless we want to allow clearing description. 
-    # Spec says "leave blank to keep current".
-    
+    # Apply changes only if user provided input
     update_title = new_title if new_title else None
     update_desc = new_desc if new_desc else None
     
@@ -66,6 +73,7 @@ def update_task_ui(manager: TodoManager):
     print(f"Task {task_id} updated successfully.")
 
 def delete_task_ui(manager: TodoManager):
+    """Workflow for deleting a task by ID."""
     print("\n--- Delete Task ---")
     task_id = get_int_input("Task ID: ")
     if task_id is None:
@@ -78,6 +86,7 @@ def delete_task_ui(manager: TodoManager):
         print(f"Error: Task {task_id} not found.")
 
 def toggle_completion_ui(manager: TodoManager):
+    """Workflow for toggling a task between pending and completed."""
     print("\n--- Toggle Completion ---")
     task_id = get_int_input("Task ID: ")
     if task_id is None:
@@ -91,6 +100,7 @@ def toggle_completion_ui(manager: TodoManager):
         print(f"Error: Task {task_id} not found.")
 
 def main():
+    """Main entry point of the application."""
     manager = TodoManager()
     
     while True:

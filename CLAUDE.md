@@ -12,7 +12,12 @@ This file guides the AI assistant (Gemini) in working with this project.
     - `Constitution.md`: Development rules.
 
 ## Core Mandates
-1.  **Follow the Constitution**: Adhere to Spec-Driven Development. Read `Constitution.md` if unsure.
+1.  **Follow the Constitution**: Adhere to Spec-Driven Development (SDD).
+    *   **Workflow**:
+        1.  **Read Specs**: Check `specs/` for existing requirements.
+        2.  **Update Specs**: If functionality changes, update the relevant `.md` file in `specs/` FIRST.
+        3.  **Implement**: Write code in `src/` to match the spec.
+        4.  **Verify**: Run/Add tests to confirm spec compliance.
 2.  **Use `uv`**: Always use `uv` for package management (`uv add`, `uv run`, `uv sync`).
     - Run scripts: `uv run src/todo_app/main.py`
     - Add dependencies: `uv add <package>`
