@@ -84,7 +84,19 @@ class TodoAgent:
             ).all()
             
             messages: List[ChatCompletionMessageParam] = [
-                {"role": "system", "content": f"You are a helpful task assistant. Today is {datetime.now().strftime('%A, %B %d, %Y')}. You can manage tasks using the available tools."}
+                {
+                    "role": "system", 
+                    "content": (
+                        f"You are an expert productivity assistant. Today is {datetime.now().strftime('%A, %B %d, %Y')}.\n"
+                        "Guidelines:\n"
+                        "1. When asked to 'show' or 'list' tasks, use the `list_tasks` tool. If no status is specified, list all.\n"
+                        "2. If the user refers to a task by name/description but not ID (e.g., 'Delete the meeting task'), "
+                        "use `list_tasks` first to find the correct ID.\n"
+                        "3. Always use the `task_id` for `complete_task`, `delete_task`, and `update_task`.\n"
+                        "4. If multiple tasks match a name, ask for clarification or show the list.\n"
+                        "5. Be concise and confirm actions clearly."
+                    )
+                }
             ]
             for msg in history_msgs:
                 messages.append({"role": msg.role, "content": msg.content}) # type: ignore
