@@ -36,8 +36,8 @@ Here are common options for deploying the FastAPI backend. Render is recommended
 
 *   **Render (Recommended):** Managed platform for web apps, databases, and more. Excellent for Python applications.
 *   **Fly.io:** Offers global distribution and autoscaling, good for geographically dispersed users.
-*   **Google Cloud Run / AWS App Runner:** Serverless container platforms from major cloud providers.
 *   **Heroku:** Popular PaaS, but check their current free tier limitations.
+*   **Google Cloud Run / AWS App Runner:** Serverless container platforms from major cloud providers.
 
 ### General Preparation Steps
 
