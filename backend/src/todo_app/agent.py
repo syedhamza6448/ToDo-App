@@ -104,6 +104,7 @@ class TodoAgent:
                 tools = await self._get_mcp_tools(session)
                 
                 # 4. LLM Loop
+                tools_used = []
                 while True:
                     response = await self.client.chat.completions.create(
                         model=self.model,
@@ -120,6 +121,7 @@ class TodoAgent:
                         for tool_call in response_message.tool_calls:
                             # Execute tool
                             tool_name = tool_call.function.name
+                            tools_used.append(tool_name)
                             tool_args = json.loads(tool_call.function.arguments)
                             
                             # Call MCP tool
@@ -143,7 +145,8 @@ class TodoAgent:
                         return {
                             "conversation_id": conversation_id,
                             "role": "assistant",
-                            "content": assistant_content
+                            "content": assistant_content,
+                            "tools_used": tools_used
                         }
 
 # Example usage (for testing)

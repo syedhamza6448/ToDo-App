@@ -7,8 +7,10 @@ from todo_app.database import engine, get_session, init_db
 from todo_app.models import Task, TaskCreate, TaskUpdate, TaskRead, TaskStatus, User
 from todo_app.auth import get_current_user_id
 from todo_app.agent import TodoAgent
+from todo_app.chatkit import router as chatkit_router
 
 app = FastAPI(title="Todo App API", version="1.0.0")
+app.include_router(chatkit_router, prefix="/api/chatkit", tags=["chatkit"])
 
 class ChatRequest(SQLModel):
     message: str
@@ -18,6 +20,7 @@ class ChatResponse(SQLModel):
     conversation_id: int
     role: str
     content: str
+    tools_used: List[str] = []
 
 @app.on_event("startup")
 def on_startup():
@@ -45,7 +48,8 @@ async def chat_endpoint(
         return ChatResponse(
             conversation_id=response["conversation_id"],
             role=response["role"],
-            content=response["content"]
+            content=response["content"],
+            tools_used=response.get("tools_used", [])
         )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

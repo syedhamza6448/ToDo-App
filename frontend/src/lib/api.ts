@@ -73,4 +73,9 @@ export const api = {
         fetchWithAuth(`/tasks/${id}/toggle`, {
             method: "PATCH",
         }),
+    chat: (userId: string, data: { message: string; conversation_id?: number | null }): Promise<{ conversation_id: number; role: string; content: string; tools_used: string[] }> =>
+        fetchWithAuth(`/api/${userId}/chat`, {
+            method: "POST",
+            body: JSON.stringify(data),
+        }),
 };
