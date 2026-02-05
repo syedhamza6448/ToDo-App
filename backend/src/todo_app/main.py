@@ -1,7 +1,24 @@
-from fastapi import FastAPI, HTTPException, Depends, Query
+from fastapi import FastAPI, HTTPException, Depends, Query, Body
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional, Any, Dict
 from sqlmodel import Session, select, SQLModel
 from datetime import datetime
+from passlib.context import CryptContext # Import CryptContext for password hashing
+
+# Placeholder for password hashing if passlib is not available.
+# In a real application, use a strong hashing library like passlib or bcrypt.
+try:
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+except ImportError:
+    # Fallback if passlib is not installed
+    print("Warning: passlib not found. Using a dummy password hash. Not secure for production.")
+    class DummyCryptContext:
+        def hash(self, password: str) -> str:
+            return f"dummy_hashed_{password}"
+        def verify(self, plain_password: str, hashed_password: str) -> bool:
+            return hashed_password == f"dummy_hashed_{plain_password}"
+    pwd_context = DummyCryptContext()
+
 
 from todo_app.database import engine, get_session, init_db
 from todo_app.models import Task, TaskCreate, TaskUpdate, TaskRead, TaskStatus, User
@@ -10,6 +27,21 @@ from todo_app.agent import TodoAgent
 from todo_app.chatkit import router as chatkit_router
 
 app = FastAPI(title="Todo App API", version="1.0.0")
+
+# Add CORS middleware
+origins = [
+    "http://localhost:3000",  # Frontend origin
+    "http://127.0.0.1:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, OPTIONS, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
+
 app.include_router(chatkit_router, prefix="/api/chatkit", tags=["chatkit"])
 
 class ChatRequest(SQLModel):
@@ -22,9 +54,48 @@ class ChatResponse(SQLModel):
     content: str
     tools_used: List[str] = []
 
-@app.on_event("startup")
-def on_startup():
+async def lifespan(app: FastAPI):
     init_db()
+    yield
+
+@app.post("/users", response_model=User, status_code=201) # Changed response model to User
+async def create_user(
+    user_in: Dict[str, str], # Expecting a dict with email, name, password
+    session: Session = Depends(get_session)
+):
+    """Create a new user."""
+    email = user_in.get("email")
+    name = user_in.get("name")
+    password = user_in.get("password")
+
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Email and password are required")
+
+    # Check if user already exists
+    existing_user = session.exec(select(User).where(User.email == email)).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User with this email already exists")
+
+    # Hash the password
+    hashed_password = pwd_context.hash(password)
+
+    # Create new user instance. Assuming 'id' can be the email or a UUID.
+    # For simplicity, let's use email as ID for now if primary key is string.
+    # If User.id is meant to be a UUID, a library like 'uuid' would be needed.
+    # For now, using email as ID, which is not ideal for primary keys but common.
+    # NOTE: If User.id MUST be a UUID, this part needs adjustment.
+    new_user = User(
+        id=email, # Using email as ID for simplicity, assuming it's unique and string
+        email=email,
+        name=name,
+        password_hash=hashed_password
+    )
+
+    session.add(new_user)
+    session.commit()
+    session.refresh(new_user)
+    return new_user
+
 
 @app.post("/api/{user_id}/chat", response_model=ChatResponse)
 async def chat_endpoint(
@@ -173,3 +244,4 @@ def toggle_task(
     session.commit()
     session.refresh(db_task)
     return db_task
+

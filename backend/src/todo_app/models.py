@@ -12,6 +12,7 @@ class User(SQLModel, table=True):
     email: str = Field(unique=True, index=True)
     name: Optional[str] = None
     image: Optional[str] = None
+    password_hash: str = Field(index=True) # Added field for password hash
     
     tasks: List["Task"] = Relationship(back_populates="user")
 
