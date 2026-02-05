@@ -1,17 +1,57 @@
 from fastapi import FastAPI, HTTPException, Depends, Query
-from typing import List, Optional
-from sqlmodel import Session, select
+from typing import List, Optional, Any, Dict
+from sqlmodel import Session, select, SQLModel
 from datetime import datetime
 
 from todo_app.database import engine, get_session, init_db
 from todo_app.models import Task, TaskCreate, TaskUpdate, TaskRead, TaskStatus, User
 from todo_app.auth import get_current_user_id
+from todo_app.agent import TodoAgent
 
 app = FastAPI(title="Todo App API", version="1.0.0")
+
+class ChatRequest(SQLModel):
+    message: str
+    conversation_id: Optional[int] = None
+
+class ChatResponse(SQLModel):
+    conversation_id: int
+    role: str
+    content: str
 
 @app.on_event("startup")
 def on_startup():
     init_db()
+
+@app.post("/api/{user_id}/chat", response_model=ChatResponse)
+async def chat_endpoint(
+    user_id: str,
+    request: ChatRequest,
+    current_user_id: str = Depends(get_current_user_id)
+):
+    """
+    Chat with the AI agent.
+    
+    - **user_id**: Must match the authenticated user.
+    - **message**: The user's input.
+    - **conversation_id**: Optional ID to continue a conversation.
+    """
+    if user_id != current_user_id:
+        raise HTTPException(status_code=403, detail="Access denied: User ID mismatch")
+    
+    agent = TodoAgent(user_id=user_id)
+    try:
+        response = await agent.process_message(request.message, request.conversation_id)
+        return ChatResponse(
+            conversation_id=response["conversation_id"],
+            role=response["role"],
+            content=response["content"]
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        # Log error in production
+        raise HTTPException(status_code=500, detail=f"Agent error: {str(e)}")
 
 @app.get("/tasks", response_model=List[TaskRead])
 def read_tasks(
